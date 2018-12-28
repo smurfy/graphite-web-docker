@@ -1,15 +1,12 @@
-FROM python:2.7-alpine3.8
+FROM alpine:3.8
 
 ENV WHISPER_VERSION 1.1.5
 ENV GRAPHITE_WEB_VERSION 1.1.5
 
-RUN apk add --no-cache curl && \
-    curl https://raw.githubusercontent.com/alpinelinux/aports/3.8-stable/main/python2/musl-find_library.patch -o /python.patch && \
-    patch /usr/local/lib/python2.7/ctypes/util.py /python.patch && \
-    rm /python.patch && \
+RUN apk add --no-cache curl python2 py2-pip && \
     apk add --no-cache libffi cairo && \
-    apk add --no-cache --virtual .build-deps libffi-dev musl-dev cairo-dev build-base && \
-    pip install gunicorn django python-memcached && \
+    apk add --no-cache --virtual .build-deps libffi-dev musl-dev cairo-dev build-base python2-dev && \
+    pip install gunicorn django python-memcached  && \
     pip install whisper==$WHISPER_VERSION && \
     pip install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/webapp" graphite-web==$GRAPHITE_WEB_VERSION && \
     apk del .build-deps curl && \
@@ -22,6 +19,7 @@ ADD graphite_wsgi.py /var/lib/graphite/conf
 RUN mkdir -p /data/graphite/conf && \
     mkdir -p /data/graphite/storage/whisper && \
     mkdir -p /data/graphite/storage/log/webapp && \
+    mkdir -p /var/log/graphite && \
     touch /data/graphite/storage/index && \
     chmod 0775 /data/graphite/storage /data/graphite/storage/whisper && \
     chmod +x /run.sh
