@@ -1,7 +1,7 @@
 FROM python:2.7-alpine3.8
 
-ENV WHISPER_VERSION 1.1.4
-ENV GRAPHITE_WEB_VERSION 1.1.4
+ENV WHISPER_VERSION 1.1.5
+ENV GRAPHITE_WEB_VERSION 1.1.5
 
 RUN apk add --no-cache curl && \
     curl https://raw.githubusercontent.com/alpinelinux/aports/3.8-stable/main/python2/musl-find_library.patch -o /python.patch && \
@@ -9,7 +9,7 @@ RUN apk add --no-cache curl && \
     rm /python.patch && \
     apk add --no-cache libffi cairo && \
     apk add --no-cache --virtual .build-deps libffi-dev musl-dev cairo-dev build-base && \
-    pip install gunicorn django && \
+    pip install gunicorn django python-memcached && \
     pip install whisper==$WHISPER_VERSION && \
     pip install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/webapp" graphite-web==$GRAPHITE_WEB_VERSION && \
     apk del .build-deps curl && \
