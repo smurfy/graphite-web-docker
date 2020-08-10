@@ -1,7 +1,7 @@
 FROM alpine:3.8
 
-ENV WHISPER_VERSION 1.1.5
-ENV GRAPHITE_WEB_VERSION 1.1.5
+ENV WHISPER_VERSION 1.1.7
+ENV GRAPHITE_WEB_VERSION 1.1.7
 
 RUN apk add --no-cache curl python2 py2-pip && \
     apk add --no-cache libffi cairo && \
