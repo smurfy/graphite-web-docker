@@ -1,4 +1,4 @@
-FROM alpine:3.11.6 as base
+FROM alpine:3.13.5 as base
 
 RUN true \
  && apk add --no-cache \
@@ -35,7 +35,7 @@ RUN true \
  && virtualenv /opt/graphite \
  && . /opt/graphite/bin/activate \
  && pip3 install \
-      django==2.2.12 \
+      django==2.2.20 \
       django-statsd-mozilla \
       fadvise \
       gunicorn==20.0.4 \
@@ -49,7 +49,7 @@ RUN true \
       psycopg2 \
       django-cockroachdb==2.2.*
 
-ARG version=1.1.7
+ARG version=1.1.8
 
 # install whisper
 ARG whisper_version=${version}
