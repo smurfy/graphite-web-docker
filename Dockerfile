@@ -19,29 +19,31 @@ RUN true \
 
 FROM base as build
 
+ARG python_binary=python3
+
 RUN true \
  && apk add --update \
       alpine-sdk \
       git \
       libffi-dev \
       pkgconfig \
-      py3-cairo \
-      py3-pip \
-      py3-virtualenv==16.7.8-r0 \
       openldap-dev \
       python3-dev \
       rrdtool-dev \
       wget \
- && virtualenv /opt/graphite \
+ && curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py \
+ && $python_binary /tmp/get-pip.py pip==20.1.1 setuptools==50.3.2 wheel==0.35.1 && rm /tmp/get-pip.py \
+ && pip install virtualenv==16.7.10 \
+ && virtualenv -p $python_binary /opt/graphite \
  && . /opt/graphite/bin/activate \
- && pip3 install \
+ && pip install \
       django==2.2.20 \
       django-statsd-mozilla \
       fadvise \
       gunicorn==20.0.4 \
       eventlet>=0.24.1 \
       gevent>=1.4 \
-      msgpack-python \
+      msgpack==0.6.2 \
       redis \
       rrdtool \
       python-ldap \
@@ -57,16 +59,16 @@ ARG whisper_repo=https://github.com/graphite-project/whisper.git
 RUN git clone -b ${whisper_version} --depth 1 ${whisper_repo} /usr/local/src/whisper \
  && cd /usr/local/src/whisper \
  && . /opt/graphite/bin/activate \
- && python3 ./setup.py install
+ && $python_binary ./setup.py install
 
 # install graphite
 ARG graphite_version=${version}
 ARG graphite_repo=https://github.com/graphite-project/graphite-web.git
 RUN . /opt/graphite/bin/activate \
-&& git clone -b ${graphite_version} --depth 1 ${graphite_repo} /usr/local/src/graphite-web \
-&& cd /usr/local/src/graphite-web \
-&& pip3 install -r requirements.txt \
-&& python3 ./setup.py install
+ && git clone -b ${graphite_version} --depth 1 ${graphite_repo} /usr/local/src/graphite-web \
+ && cd /usr/local/src/graphite-web \
+ && pip install -r requirements.txt \
+ && $python_binary ./setup.py install
 
 # config graphite
 WORKDIR /opt/graphite/webapp
